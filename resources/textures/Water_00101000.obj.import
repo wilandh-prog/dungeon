@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://dffffbqjstutb"
+path="res://.godot/imported/Water_00101000.obj-3f39e7a8a63ace073b02756c8a3fd7bb.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Water_00101000.obj-3f39e7a8a63ace073b02756c8a3fd7bb.mesh"]
+
+source_file="res://resources/textures/Water_00101000.obj"
+dest_files=["res://.godot/imported/Water_00101000.obj-3f39e7a8a63ace073b02756c8a3fd7bb.mesh", "res://.godot/imported/Water_00101000.obj-3f39e7a8a63ace073b02756c8a3fd7bb.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

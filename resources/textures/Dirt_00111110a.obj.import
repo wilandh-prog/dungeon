@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://cy8b3ro1bd30w"
+path="res://.godot/imported/Dirt_00111110a.obj-3f92937bbe491cc00b3df4ca1d474f50.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Dirt_00111110a.obj-3f92937bbe491cc00b3df4ca1d474f50.mesh"]
+
+source_file="res://resources/textures/Dirt_00111110a.obj"
+dest_files=["res://.godot/imported/Dirt_00111110a.obj-3f92937bbe491cc00b3df4ca1d474f50.mesh", "res://.godot/imported/Dirt_00111110a.obj-3f92937bbe491cc00b3df4ca1d474f50.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

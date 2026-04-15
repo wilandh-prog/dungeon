@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://dc55uqfm7a475"
+path="res://.godot/imported/Claimed_00111110.obj-158aea1fbb22284e147344831425cded.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Claimed_00111110.obj-158aea1fbb22284e147344831425cded.mesh"]
+
+source_file="res://resources/textures/Claimed_00111110.obj"
+dest_files=["res://.godot/imported/Claimed_00111110.obj-158aea1fbb22284e147344831425cded.mesh", "res://.godot/imported/Claimed_00111110.obj-158aea1fbb22284e147344831425cded.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

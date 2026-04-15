@@ -1,0 +1,120 @@
+[gd_scene load_steps=2 format=3 uid="uid://bspellcraft"]
+
+[ext_resource type="Script" path="res://scripts/ui/spell_crafting.gd" id="1_craft"]
+
+[node name="SpellCrafting" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_craft")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7)
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = 50.0
+offset_right = -50.0
+offset_bottom = -50.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBox" type="HBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="InventoryPanel" type="PanelContainer" parent="PanelContainer/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.0
+
+[node name="VBox" type="VBoxContainer" parent="PanelContainer/HBox/InventoryPanel"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="PanelContainer/HBox/InventoryPanel/VBox"]
+layout_mode = 2
+text = "Fragments"
+horizontal_alignment = 1
+
+[node name="InventoryList" type="ItemList" parent="PanelContainer/HBox/InventoryPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CraftingPanel" type="PanelContainer" parent="PanelContainer/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.0
+
+[node name="VBox" type="VBoxContainer" parent="PanelContainer/HBox/CraftingPanel"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="PanelContainer/HBox/CraftingPanel/VBox"]
+layout_mode = 2
+text = "Crafting Slots"
+horizontal_alignment = 1
+
+[node name="Slots" type="VBoxContainer" parent="PanelContainer/HBox/CraftingPanel/VBox"]
+layout_mode = 2
+
+[node name="Slot1" type="Button" parent="PanelContainer/HBox/CraftingPanel/VBox/Slots"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+text = "[Empty]"
+
+[node name="Slot2" type="Button" parent="PanelContainer/HBox/CraftingPanel/VBox/Slots"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+text = "[Empty]"
+
+[node name="Slot3" type="Button" parent="PanelContainer/HBox/CraftingPanel/VBox/Slots"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+text = "[Empty]"
+
+[node name="Spacer" type="Control" parent="PanelContainer/HBox/CraftingPanel/VBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 20)
+
+[node name="EquipSlot" type="OptionButton" parent="PanelContainer/HBox/CraftingPanel/VBox"]
+layout_mode = 2
+
+[node name="CraftButton" type="Button" parent="PanelContainer/HBox/CraftingPanel/VBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+disabled = true
+text = "Craft Spell"
+
+[node name="ClearButton" type="Button" parent="PanelContainer/HBox/CraftingPanel/VBox"]
+layout_mode = 2
+text = "Clear"
+
+[node name="PreviewPanel" type="PanelContainer" parent="PanelContainer/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.0
+
+[node name="VBox" type="VBoxContainer" parent="PanelContainer/HBox/PreviewPanel"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="PanelContainer/HBox/PreviewPanel/VBox"]
+layout_mode = 2
+text = "Preview"
+horizontal_alignment = 1
+
+[node name="PreviewText" type="Label" parent="PanelContainer/HBox/PreviewPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Place fragments to preview spell"
+autowrap_mode = 2

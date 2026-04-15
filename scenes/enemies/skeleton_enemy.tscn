@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3 uid="uid://bskeleton001"]
+
+[ext_resource type="Script" path="res://scripts/enemies/skeleton_enemy.gd" id="1_skel"]
+[ext_resource type="PackedScene" uid="uid://pg2ys172va2w" path="res://resources/archer/archer_final.glb" id="2_archer"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_skel"]
+radius = 0.35
+height = 1.6
+
+[node name="SkeletonEnemy" type="CharacterBody3D" groups=["enemies"]]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_skel")
+
+[node name="ArcherModel" parent="." instance=ExtResource("2_archer")]
+transform = Transform3D(0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_skel")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+path_desired_distance = 0.5
+target_desired_distance = 1.0

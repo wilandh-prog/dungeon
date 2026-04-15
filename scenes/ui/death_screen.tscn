@@ -1,0 +1,61 @@
+[gd_scene load_steps=2 format=3 uid="uid://bdeathscrn1"]
+
+[ext_resource type="Script" path="res://scripts/ui/death_screen.gd" id="1_death"]
+
+[node name="DeathScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_death")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.3, 0, 0, 0.7)
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -180.0
+offset_right = 160.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="PanelContainer/VBox"]
+layout_mode = 2
+text = "YOU DIED"
+horizontal_alignment = 1
+
+[node name="StatsLabel" type="Label" parent="PanelContainer/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Stats..."
+horizontal_alignment = 1
+
+[node name="ReviveButton" type="Button" parent="PanelContainer/VBox"]
+layout_mode = 2
+text = "Watch Ad to Revive (50% HP)"
+
+[node name="RestartButton" type="Button" parent="PanelContainer/VBox"]
+layout_mode = 2
+text = "New Run"
+
+[node name="QuitButton" type="Button" parent="PanelContainer/VBox"]
+layout_mode = 2
+text = "Main Menu"
