@@ -16,6 +16,7 @@ func _ready() -> void:
 	detection_range = 12.0
 	super._ready()
 	if model:
+		_make_materials_opaque(model)
 		anim_player = _find_anim_player(model)
 		if anim_player:
 			_load_extra_animations()
@@ -24,6 +25,20 @@ func _ready() -> void:
 			_strip_root_motion(walk_anim)
 			_strip_root_motion(attack_anim)
 	_play_anim(idle_anim)
+
+func _make_materials_opaque(node: Node) -> void:
+	if node is MeshInstance3D:
+		var mi := node as MeshInstance3D
+		if mi.mesh:
+			for i in mi.mesh.get_surface_count():
+				var mat := mi.get_active_material(i)
+				if mat is StandardMaterial3D:
+					var m: StandardMaterial3D = mat.duplicate()
+					m.transparency = BaseMaterial3D.TRANSPARENCY_DISABLED
+					m.cull_mode = BaseMaterial3D.CULL_BACK
+					mi.set_surface_override_material(i, m)
+	for child in node.get_children():
+		_make_materials_opaque(child)
 
 func _find_anim_player(node: Node) -> AnimationPlayer:
 	if node is AnimationPlayer:
