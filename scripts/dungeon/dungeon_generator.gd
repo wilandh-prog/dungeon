@@ -8,6 +8,134 @@ var rng := RandomNumberGenerator.new()
 var _floor_mat: StandardMaterial3D = null
 var _wall_mat: StandardMaterial3D = null
 var _ceiling_mat: StandardMaterial3D = null
+var _flame_mat: ShaderMaterial = null
+var _torch_bracket_mat: StandardMaterial3D = null
+
+func _ensure_torch_resources() -> void:
+	if _flame_mat:
+		return
+	var shader := load("res://resources/shaders/torch_flame.gdshader") as Shader
+	_flame_mat = ShaderMaterial.new()
+	_flame_mat.shader = shader
+	_flame_mat.set_shader_parameter("fire_height", 0.65)
+	_flame_mat.set_shader_parameter("fire_width", 0.32)
+	_flame_mat.set_shader_parameter("noise_threshold", 0.65)
+	_flame_mat.set_shader_parameter("sharpness_cutoff", 1.2)
+	_flame_mat.set_shader_parameter("emission_strength", 1.5)
+	_flame_mat.set_shader_parameter("core_glow_multiplier", 2.0)
+	_flame_mat.set_shader_parameter("wobble_strength", 0.5)
+	_flame_mat.set_shader_parameter("raymarch_steps", 16)
+
+	_torch_bracket_mat = StandardMaterial3D.new()
+	_torch_bracket_mat.albedo_color = Color(0.2, 0.12, 0.06)
+	_torch_bracket_mat.roughness = 0.9
+
+func _get_torch_offsets(wall_length: float) -> Array[float]:
+	var offsets: Array[float] = []
+	var margin := 1.5
+	var usable := wall_length - margin * 2.0
+	if usable <= 0.0:
+		return offsets
+	if wall_length < 9.0:
+		offsets.append(0.0)
+	elif wall_length < 14.0:
+		offsets.append(-usable * 0.25)
+		offsets.append(usable * 0.25)
+	else:
+		offsets.append(-usable / 3.0)
+		offsets.append(0.0)
+		offsets.append(usable / 3.0)
+	return offsets
+
+func _add_torch(parent: Node3D, pos: Vector3, wall_normal: Vector3) -> void:
+	_ensure_torch_resources()
+	var torch_node := Node3D.new()
+	torch_node.name = "Torch"
+	torch_node.position = pos
+
+	var bracket_rot_y := atan2(wall_normal.x, wall_normal.z)
+
+	# Bracket arm sticking out from wall
+	var bracket_mi := MeshInstance3D.new()
+	var bracket_box := BoxMesh.new()
+	bracket_box.size = Vector3(0.05, 0.05, 0.22)
+	bracket_mi.mesh = bracket_box
+	bracket_mi.rotation.y = bracket_rot_y
+	bracket_mi.position = wall_normal * 0.11
+	bracket_mi.material_override = _torch_bracket_mat
+	torch_node.add_child(bracket_mi)
+
+	# Cup at bracket tip
+	var cup_mi := MeshInstance3D.new()
+	var cup_box := BoxMesh.new()
+	cup_box.size = Vector3(0.1, 0.08, 0.1)
+	cup_mi.mesh = cup_box
+	cup_mi.position = wall_normal * 0.22 + Vector3(0, 0.05, 0)
+	cup_mi.material_override = _torch_bracket_mat
+	torch_node.add_child(cup_mi)
+
+	# Flame quad — must be large enough to cover full fire AABB in screen space.
+	# Fire spans NODE_POSITION_WORLD.y to +fire_height above it, so quad center
+	# must sit below the fire midpoint. Placing at cup level (y=0.05) with a
+	# 1.5×1.5 quad covers [-0.70, +0.80] relative to torch node, fully enclosing
+	# the fire ([0.05, 0.70]).
+	var flame_mi := MeshInstance3D.new()
+	var quad := QuadMesh.new()
+	quad.size = Vector2(1.5, 1.5)
+	flame_mi.mesh = quad
+	flame_mi.material_override = _flame_mat
+	flame_mi.position = wall_normal * 0.22 + Vector3(0, 0.05, 0)
+	torch_node.add_child(flame_mi)
+
+	# OmniLight at flame center
+	var light := OmniLight3D.new()
+	light.position = wall_normal * 0.22 + Vector3(0, 0.38, 0)
+	light.omni_range = 5.0
+	light.light_energy = 0.9
+	light.light_color = Color(1.0, 0.72, 0.28)
+	light.shadow_enabled = false
+	torch_node.add_child(light)
+
+	var flicker_script := load("res://scripts/dungeon/torch_flicker.gd")
+	torch_node.set_script(flicker_script)
+	parent.add_child(torch_node)
+
+func _add_room_torches(room: Node3D, room_data: Dictionary) -> void:
+	var w: float = room_data.width
+	var d: float = room_data.depth
+	var conns: Array = room_data.connections
+	const TORCH_Y := 2.2
+
+	# North wall (Z-)
+	if not conns.has(Vector2i(0, -1)):
+		for offset: float in _get_torch_offsets(w):
+			_add_torch(room, Vector3(offset, TORCH_Y, -d * 0.5 + 0.15), Vector3(0, 0, 1))
+
+	# South wall (Z+)
+	if not conns.has(Vector2i(0, 1)):
+		for offset: float in _get_torch_offsets(w):
+			_add_torch(room, Vector3(offset, TORCH_Y, d * 0.5 - 0.15), Vector3(0, 0, -1))
+
+	# West wall (X-)
+	if not conns.has(Vector2i(-1, 0)):
+		for offset: float in _get_torch_offsets(d):
+			_add_torch(room, Vector3(-w * 0.5 + 0.15, TORCH_Y, offset), Vector3(1, 0, 0))
+
+	# East wall (X+)
+	if not conns.has(Vector2i(1, 0)):
+		for offset: float in _get_torch_offsets(d):
+			_add_torch(room, Vector3(w * 0.5 - 0.15, TORCH_Y, offset), Vector3(-1, 0, 0))
+
+func _add_hallway_torches(hallway: Node3D, _length: float, is_x_axis: bool) -> void:
+	var hw := Constants.DOOR_WIDTH * 0.5
+	const TORCH_Y := 2.2
+
+	if is_x_axis:
+		_add_torch(hallway, Vector3(0, TORCH_Y, -(hw - 0.15)), Vector3(0, 0, 1))
+		_add_torch(hallway, Vector3(0, TORCH_Y,  (hw - 0.15)), Vector3(0, 0, -1))
+	else:
+		_add_torch(hallway, Vector3(-(hw - 0.15), TORCH_Y, 0), Vector3(1, 0, 0))
+		_add_torch(hallway, Vector3( (hw - 0.15), TORCH_Y, 0), Vector3(-1, 0, 0))
 
 func _ensure_materials() -> void:
 	if _floor_mat:
@@ -228,14 +356,8 @@ func build_room(room_data: Dictionary, _connections: Array[Array]) -> Node3D:
 	_add_room_collision(room, room_data)
 
 	# Room-specific content will be populated by room.gd _ready
-	# Add light to room
-	var light := OmniLight3D.new()
-	light.position = Vector3(0, h - 0.5, 0)
-	light.omni_range = maxf(w, d)
-	light.light_energy = 0.8
-	light.light_color = Color(1.0, 0.9, 0.8)
-	light.shadow_enabled = false
-	room.add_child(light)
+	# Add wall torches
+	_add_room_torches(room, room_data)
 
 	# Add door triggers
 	for conn_dir: Vector2i in conns:
@@ -378,14 +500,8 @@ func build_hallway(room_a_data: Dictionary, room_b_data: Dictionary, rooms_dict:
 
 	hallway.add_child(static_body)
 
-	# Small light in hallway
-	var light := OmniLight3D.new()
-	light.position = Vector3(0, door_h - 0.3, 0)
-	light.omni_range = length
-	light.light_energy = 0.4
-	light.light_color = Color(1.0, 0.9, 0.8)
-	light.shadow_enabled = false
-	hallway.add_child(light)
+	# Add wall torches to hallway
+	_add_hallway_torches(hallway, length, is_x_axis)
 
 	return hallway
 
