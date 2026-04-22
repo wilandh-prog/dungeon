@@ -78,7 +78,7 @@ func _expire_with_impact() -> void:
 		return
 	_done = true
 	set_process(false)
-	$Area3D.monitoring = false
+	$Area3D.set_deferred("monitoring", false)
 	_spawn_impact()
 	_on_expire()
 
