@@ -41,5 +41,5 @@ func _update_beam_visual() -> void:
 	if raycast and raycast.is_colliding():
 		length = global_position.distance_to(raycast.get_collision_point())
 
-	mesh.scale = Vector3(1.0, length, 1.0)
+	mesh.scale = Vector3(1.0, 1.0, length)
 	mesh.position = Vector3(0, 0, -length / 2.0)

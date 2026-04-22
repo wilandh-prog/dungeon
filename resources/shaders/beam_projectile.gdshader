@@ -2,13 +2,12 @@ shader_type spatial;
 render_mode unshaded, cull_disabled, blend_add, depth_draw_never, depth_test_disabled;
 
 uniform vec4 beam_color : source_color = vec4(0.3, 0.7, 1.0, 1.0);
-uniform float emission_strength : hint_range(0.0, 30.0) = 16.0;
-uniform float scroll_speed : hint_range(0.0, 20.0) = 6.0;
-uniform float turbulence_scale : hint_range(1.0, 20.0) = 8.0;
-uniform float core_sharpness : hint_range(0.5, 5.0) = 1.8;
-uniform float glow_sharpness : hint_range(0.1, 3.0) = 0.6;
-uniform float pulse_speed : hint_range(0.0, 30.0) = 12.0;
-uniform float flicker_speed : hint_range(0.0, 30.0) = 18.0;
+uniform float emission_strength : hint_range(0.0, 30.0) = 20.0;
+uniform float core_width : hint_range(0.01, 0.5) = 0.15;
+uniform float glow_falloff : hint_range(0.5, 8.0) = 4.0;
+uniform float scroll_speed : hint_range(0.0, 20.0) = 8.0;
+uniform float pulse_speed : hint_range(0.0, 30.0) = 15.0;
+uniform float flicker_speed : hint_range(0.0, 30.0) = 20.0;
 
 float hash(vec3 p) {
 	p = fract(p * 0.3183099 + vec3(0.1, 0.3, 0.7));
@@ -27,36 +26,57 @@ float vnoise(vec3 p) {
 			mix(hash(i+vec3(0,1,1)), hash(i+vec3(1,1,1)), f.x), f.y), f.z);
 }
 
+void vertex() {
+	// Beam direction in view space (model -Z axis)
+	vec3 beam_dir_vs = normalize((MODELVIEW_MATRIX * vec4(0.0, 0.0, -1.0, 0.0)).xyz);
+
+	// Right vector always perpendicular to beam and camera forward (0,0,-1 in view space)
+	vec3 right_raw = cross(beam_dir_vs, vec3(0.0, 0.0, -1.0));
+	vec3 right_vs = right_raw / max(length(right_raw), 0.001);
+
+	// Place vertex: along-beam position from VERTEX.z, width offset from VERTEX.x
+	vec3 along_vs = (MODELVIEW_MATRIX * vec4(0.0, 0.0, VERTEX.z, 1.0)).xyz;
+	vec3 vertex_vs = along_vs + right_vs * VERTEX.x;
+
+	POSITION = PROJECTION_MATRIX * vec4(vertex_vs, 1.0);
+}
+
 void fragment() {
 	float along = UV.y;
-	float around = UV.x;
+	float across = UV.x;
 
-	// Radial glow from normal facing camera: bright at center, falls off at edges
-	float ndotv = clamp(dot(NORMAL, VIEW), 0.0, 1.0);
-	float core = pow(ndotv, core_sharpness);
-	float glow = pow(ndotv, glow_sharpness);
+	// Radial distance from center (0 = center line, 1 = edge)
+	float radial = abs(across - 0.5) * 2.0;
 
-	// Turbulence scrolling toward target
-	float t = along * turbulence_scale - TIME * scroll_speed;
-	float n1 = vnoise(vec3(around * 4.0, t, 0.5));
-	float n2 = vnoise(vec3(around * 8.0 + 2.1, t * 1.7, 1.3));
-	float turbulence = n1 * 0.6 + n2 * 0.4;
+	// Tight bright core
+	float core = pow(max(0.0, 1.0 - radial / core_width), 2.5);
 
-	// Energy pulse rings traveling toward target
-	float pulse = pow(max(0.0, sin(along * 18.0 - TIME * pulse_speed) * 0.5 + 0.5), 3.0);
+	// Soft outer glow
+	float glow = pow(max(0.0, 1.0 - radial), glow_falloff);
 
-	// Origin/tip fade
-	float endcap = smoothstep(0.0, 0.04, along) * smoothstep(1.0, 0.96, along);
+	// Scrolling energy noise along beam
+	float t = along * 8.0 + TIME * scroll_speed;
+	float turbulence = vnoise(vec3(across * 6.0, t, 0.5));
+
+	// Pulse rings traveling along beam
+	float pulse = pow(max(0.0, sin(along * 20.0 + TIME * pulse_speed) * 0.5 + 0.5), 3.0);
+
+	// Tip/origin fade
+	float endcap = smoothstep(0.0, 0.05, along) * smoothstep(1.0, 0.95, along);
 
 	// Flicker
 	float flicker = sin(TIME * flicker_speed) * 0.08 + 0.92;
 	float flicker2 = sin(TIME * flicker_speed * 1.6 + 1.1) * 0.05 + 0.95;
 
-	float total = (glow * 0.4 + core * 1.2 + turbulence * core * 0.9 + pulse * core * 0.7) * flicker * flicker2 * endcap;
+	float total = (core * 3.0 + glow * 0.7 + turbulence * glow * 0.6 + pulse * glow * 0.4) * flicker * flicker2 * endcap;
 
 	if (total < 0.01) discard;
 
-	ALBEDO = beam_color.rgb * total * emission_strength;
+	// White-hot at core center, beam color at glow edges
+	float whiteness = clamp(core * 1.5, 0.0, 1.0);
+	vec3 color = mix(beam_color.rgb, vec3(1.0), whiteness * 0.8);
+
+	ALBEDO = color * total * emission_strength;
 	EMISSION = ALBEDO;
 	ALPHA = clamp(total, 0.0, 1.0);
 }

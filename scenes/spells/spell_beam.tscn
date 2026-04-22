@@ -3,30 +3,24 @@
 [ext_resource type="Script" path="res://scripts/spells/spell_beam.gd" id="1_beam"]
 [ext_resource type="Shader" path="res://resources/shaders/beam_projectile.gdshader" id="2_beam_shader"]
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_beam"]
-top_radius = 0.06
-bottom_radius = 0.06
-height = 1.0
-radial_segments = 16
-rings = 4
+[sub_resource type="PlaneMesh" id="PlaneMesh_beam"]
+size = Vector2(0.3, 1.0)
 
 [sub_resource type="ShaderMaterial" id="BeamMat"]
 shader = ExtResource("2_beam_shader")
 shader_parameter/beam_color = Color(0.3, 0.7, 1.0, 1.0)
-shader_parameter/emission_strength = 16.0
-shader_parameter/scroll_speed = 6.0
-shader_parameter/turbulence_scale = 8.0
-shader_parameter/core_sharpness = 1.8
-shader_parameter/glow_sharpness = 0.6
-shader_parameter/pulse_speed = 12.0
-shader_parameter/flicker_speed = 18.0
+shader_parameter/emission_strength = 20.0
+shader_parameter/core_width = 0.15
+shader_parameter/glow_falloff = 4.0
+shader_parameter/scroll_speed = 8.0
+shader_parameter/pulse_speed = 15.0
+shader_parameter/flicker_speed = 20.0
 
 [node name="SpellBeam" type="Node3D"]
 script = ExtResource("1_beam")
 
 [node name="BeamMesh" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0)
-mesh = SubResource("CylinderMesh_beam")
+mesh = SubResource("PlaneMesh_beam")
 material_override = SubResource("BeamMat")
 
 [node name="RayCast3D" type="RayCast3D" parent="."]
