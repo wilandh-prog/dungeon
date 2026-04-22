@@ -1,36 +1,21 @@
-[gd_scene load_steps=9 format=3 uid="uid://bspellbolt1"]
+[gd_scene load_steps=6 format=3 uid="uid://bspellbolt1"]
 
 [ext_resource type="Script" path="res://scripts/spells/spell_bolt.gd" id="1_bolt"]
 [ext_resource type="Shader" path="res://resources/shaders/bolt_projectile.gdshader" id="2_bolt_shader"]
-[ext_resource type="Shader" path="res://resources/shaders/orb_projectile.gdshader" id="3_orb_shader"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_bolt"]
-radius = 0.06
-height = 0.6
+radius = 0.025
+height = 1.5
 
 [sub_resource type="ShaderMaterial" id="BoltMat"]
 shader = ExtResource("2_bolt_shader")
 shader_parameter/bolt_color = Color(0.4, 0.6, 1.0, 1.0)
-shader_parameter/emission_strength = 14.0
+shader_parameter/emission_strength = 18.0
 shader_parameter/arc_speed = 9.0
 shader_parameter/noise_scale = 4.0
-shader_parameter/arc_sharpness = 2.8
+shader_parameter/arc_sharpness = 3.0
 shader_parameter/flicker_speed = 14.0
-shader_parameter/wobble_amount = 0.012
-
-[sub_resource type="SphereMesh" id="SphereMesh_core"]
-radius = 0.07
-height = 0.14
-
-[sub_resource type="ShaderMaterial" id="CoreMat"]
-shader = ExtResource("3_orb_shader")
-shader_parameter/color_core = Color(0.8, 0.9, 1.0, 1.0)
-shader_parameter/color_edge = Color(0.3, 0.5, 1.0, 1.0)
-shader_parameter/emission_strength = 12.0
-shader_parameter/pulse_speed = 6.0
-shader_parameter/wobble_amount = 0.015
-shader_parameter/noise_scale = 4.0
-shader_parameter/fresnel_power = 2.5
+shader_parameter/wobble_amount = 0.018
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_bolt"]
 radius = 0.15
@@ -42,10 +27,6 @@ script = ExtResource("1_bolt")
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0)
 mesh = SubResource("CapsuleMesh_bolt")
 material_override = SubResource("BoltMat")
-
-[node name="CoreGlow" type="MeshInstance3D" parent="."]
-mesh = SubResource("SphereMesh_core")
-material_override = SubResource("CoreMat")
 
 [node name="Area3D" type="Area3D" parent="."]
 collision_layer = 8

@@ -27,14 +27,6 @@ func _apply_color(color: Color) -> void:
 		bolt_mesh.material_override = bolt_mat
 		bolt_mat.set_shader_parameter("bolt_color", Color(color.r, color.g, color.b, 1.0))
 
-	var core := get_node_or_null("CoreGlow")
-	if core and core.material_override is ShaderMaterial:
-		var core_mat := (core.material_override as ShaderMaterial).duplicate()
-		core.material_override = core_mat
-		var core_color := Color.WHITE.lerp(color, 0.3)
-		core_mat.set_shader_parameter("color_core", core_color)
-		core_mat.set_shader_parameter("color_edge", color)
-
 func _process(delta: float) -> void:
 	if not _direction_set:
 		direction = -global_transform.basis.z
