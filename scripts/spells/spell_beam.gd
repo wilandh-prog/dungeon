@@ -12,13 +12,18 @@ func _ready() -> void:
 		raycast.target_position = Vector3(0, 0, -beam_range)
 	_on_cast()
 
+func _apply_color(color: Color) -> void:
+	var mesh := get_node_or_null("BeamMesh")
+	if mesh and mesh.material_override is ShaderMaterial:
+		var beam_mat := (mesh.material_override as ShaderMaterial).duplicate()
+		mesh.material_override = beam_mat
+		beam_mat.set_shader_parameter("beam_color", Color(color.r, color.g, color.b, 1.0))
+
 func _process(delta: float) -> void:
 	tick_timer -= delta
 	if tick_timer <= 0:
 		tick_timer = tick_rate
 		_beam_tick()
-
-	# Update visual beam length
 	_update_beam_visual()
 
 func _beam_tick() -> void:
@@ -28,7 +33,7 @@ func _beam_tick() -> void:
 			_on_hit(collider)
 
 func _update_beam_visual() -> void:
-	var mesh: MeshInstance3D = get_node_or_null("MeshInstance3D")
+	var mesh: MeshInstance3D = get_node_or_null("BeamMesh")
 	if mesh == null:
 		return
 
@@ -36,5 +41,5 @@ func _update_beam_visual() -> void:
 	if raycast and raycast.is_colliding():
 		length = global_position.distance_to(raycast.get_collision_point())
 
-	mesh.scale = Vector3(0.1, 0.1, length)
+	mesh.scale = Vector3(1.0, length, 1.0)
 	mesh.position = Vector3(0, 0, -length / 2.0)
