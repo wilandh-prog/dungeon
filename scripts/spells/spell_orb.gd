@@ -1,10 +1,14 @@
 extends SpellEffect
 
+const EXPLOSION_SCENE := preload("res://scenes/spells/orb_explosion.tscn")
+const MIN_TRAVEL := 2.5
+
 var speed: float = 8.0
 var max_range: float = 20.0
 var aoe_radius: float = 3.0
 var distance_traveled: float = 0.0
 var direction: Vector3 = Vector3.FORWARD
+var _exploded := false
 
 func _ready() -> void:
 	speed = spell_data.get("speed", 8.0)
@@ -30,22 +34,29 @@ func _process(delta: float) -> void:
 func _on_area_body_entered(body: Node3D) -> void:
 	if body == caster:
 		return
+	if body is StaticBody3D:
+		_explode()
+		return
+	if distance_traveled < MIN_TRAVEL:
+		return
 	if body.is_in_group("enemies"):
 		_explode()
 
 func _explode() -> void:
-	# AoE damage at current position
+	if _exploded:
+		return
+	_exploded = true
+	set_process(false)
+	$Area3D.monitoring = false
+
 	var enemies := get_tree().get_nodes_in_group("enemies")
 	for enemy: Node3D in enemies:
-		var dist: float = global_position.distance_to(enemy.global_position)
-		if dist <= aoe_radius:
+		if global_position.distance_to(enemy.global_position) <= aoe_radius:
 			_on_hit(enemy)
 
-	# Visual: brief scale-up then remove
-	var mesh: MeshInstance3D = get_node_or_null("MeshInstance3D")
-	if mesh:
-		var tween := create_tween()
-		tween.tween_property(mesh, "scale", Vector3.ONE * aoe_radius, 0.15)
-		tween.tween_callback(_on_expire)
-	else:
-		_on_expire()
+	var expl: Node3D = EXPLOSION_SCENE.instantiate()
+	expl.set("element_color", spell_data.get("color", Color.WHITE))
+	get_tree().current_scene.add_child(expl)
+	expl.global_position = global_position
+
+	_on_expire()

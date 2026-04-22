@@ -1,0 +1,55 @@
+[gd_scene load_steps=8 format=3 uid="uid://borb_expl01"]
+
+[ext_resource type="Script" path="res://scripts/spells/orb_explosion.gd" id="1_script"]
+[ext_resource type="Shader" path="res://resources/shaders/orb_explosion.gdshader" id="2_shader"]
+[ext_resource type="Shader" path="res://resources/shaders/orb_ring.gdshader" id="3_ring_shader"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_expl"]
+radius = 0.5
+height = 1.0
+radial_segments = 16
+rings = 8
+
+[sub_resource type="ShaderMaterial" id="ShaderMat_expl"]
+shader = ExtResource("2_shader")
+shader_parameter/expand_t = 0.0
+shader_parameter/dissolve_t = 0.0
+shader_parameter/color_core = Color(1, 0.85, 0.5, 1)
+shader_parameter/color_edge = Color(0.2, 0.5, 1, 1)
+shader_parameter/emission_strength = 15.0
+shader_parameter/noise_scale = 3.5
+shader_parameter/noise_strength = 0.35
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ring"]
+size = Vector2(1, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMat_ring"]
+shader = ExtResource("3_ring_shader")
+shader_parameter/ring_progress = 0.0
+shader_parameter/color = Color(1, 0.6, 0.2, 1)
+shader_parameter/emission_strength = 10.0
+
+[node name="OrbExplosion" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Sphere" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_expl")
+material_override = SubResource("ShaderMat_expl")
+
+[node name="Ring" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_ring")
+material_override = SubResource("ShaderMat_ring")
+
+[node name="Particles" type="GPUParticles3D" parent="."]
+amount = 60
+lifetime = 0.5
+one_shot = true
+explosiveness = 0.95
+emitting = false
+
+[node name="Embers" type="GPUParticles3D" parent="."]
+amount = 30
+lifetime = 1.0
+one_shot = true
+explosiveness = 0.7
+emitting = false

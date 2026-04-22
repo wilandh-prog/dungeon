@@ -1,16 +1,14 @@
 [gd_scene load_steps=5 format=3 uid="uid://bspellorb01"]
 
 [ext_resource type="Script" path="res://scripts/spells/spell_orb.gd" id="1_orb"]
+[ext_resource type="Shader" path="res://resources/shaders/orb_projectile.gdshader" id="2_shader"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_orb"]
 radius = 0.35
 height = 0.7
 
-[sub_resource type="StandardMaterial3D" id="Material_orb"]
-albedo_color = Color(1, 1, 1, 0.8)
-emission_enabled = true
-emission = Color(1, 1, 1, 1)
-emission_energy_multiplier = 2.0
+[sub_resource type="ShaderMaterial" id="Material_orb"]
+shader = ExtResource("2_shader")
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_orb"]
 radius = 0.4
@@ -24,7 +22,7 @@ material_override = SubResource("Material_orb")
 
 [node name="Area3D" type="Area3D" parent="."]
 collision_layer = 8
-collision_mask = 4
+collision_mask = 5
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
 shape = SubResource("SphereShape3D_orb")
