@@ -2,6 +2,7 @@ extends SpellEffect
 
 const EXPLOSION_SCENE := preload("res://scenes/spells/orb_explosion.tscn")
 const BOLT_SCENE := preload("res://scenes/spells/spell_bolt.tscn")
+const MIN_TRAVEL_WALL := 0.5
 
 var speed: float = 20.0
 var max_range: float = 30.0
@@ -52,7 +53,8 @@ func _on_area_body_entered(body: Node3D) -> void:
 	if body == caster:
 		return
 	if body is StaticBody3D:
-		_expire_with_impact()
+		if distance_traveled >= MIN_TRAVEL_WALL:
+			_expire_with_impact()
 		return
 	if body.is_in_group("enemies"):
 		if hit_targets.has(body):
