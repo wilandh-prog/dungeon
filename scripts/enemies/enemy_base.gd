@@ -135,11 +135,13 @@ func _die() -> void:
 	tween.tween_callback(queue_free)
 
 func _drop_fragment() -> void:
+	if not is_inside_tree():
+		return
 	if randf() < 0.7: # 70% drop chance
 		var rng := RandomNumberGenerator.new()
 		rng.randomize()
 		var fragment := SpellFragment.create_random(rng)
 		var pickup := preload("res://scenes/spells/fragment_pickup.tscn").instantiate()
 		pickup.fragment = fragment
-		pickup.global_position = global_position + Vector3(0, 0.5, 0)
 		get_tree().current_scene.add_child(pickup)
+		pickup.global_position = global_position + Vector3(0, 0.5, 0)

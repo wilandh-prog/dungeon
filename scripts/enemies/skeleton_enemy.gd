@@ -117,6 +117,6 @@ func _fire_projectile() -> void:
 	projectile.speed = 8.0
 	var dir := (target.global_position - global_position).normalized()
 	projectile.direction = dir
-	projectile.global_position = global_position + Vector3(0, 1.0, 0) + dir * 0.5
 	get_tree().current_scene.add_child(projectile)
+	projectile.global_position = global_position + Vector3(0, 1.0, 0) + dir * 0.5
 	current_anim = ""  # Allow re-triggering shoot or switching to idle/walk

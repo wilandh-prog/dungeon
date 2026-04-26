@@ -42,6 +42,8 @@ func _process(delta: float) -> void:
 		_expire_with_impact()
 
 func _on_area_body_entered(body: Node3D) -> void:
+	if not is_instance_valid(body) or not body.is_inside_tree():
+		return
 	if body == caster:
 		return
 	if body is StaticBody3D:
@@ -82,8 +84,8 @@ func _do_split() -> void:
 		split_bolt.initialize(spell_data, caster)
 		split_bolt.has_split = false
 		split_bolt.split_done = true
+		split_bolt.damage = damage * 0.6
+		get_tree().current_scene.add_child(split_bolt)
 		split_bolt.global_position = global_position
 		split_bolt.global_rotation = global_rotation
 		split_bolt.rotate_y(angle)
-		split_bolt.damage = damage * 0.6
-		get_tree().current_scene.add_child(split_bolt)

@@ -109,7 +109,10 @@ func _start_beam(spell: Dictionary) -> void:
 
 	var instance := SpellBeamScene.instantiate()
 	instance.initialize(spell, player)
-	add_child(instance)
+	instance.wand_tip = wand_tip
+	get_tree().current_scene.add_child(instance)
+	instance.global_transform.basis = player.camera.global_transform.basis
+	instance.global_position = wand_tip.global_position
 	beam_visual = instance
 
 func _stop_beam() -> void:

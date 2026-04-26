@@ -27,16 +27,12 @@ float vnoise(vec3 p) {
 }
 
 void vertex() {
-	// Beam direction in view space (model -Z axis)
-	vec3 beam_dir_vs = normalize((MODELVIEW_MATRIX * vec4(0.0, 0.0, -1.0, 0.0)).xyz);
+	// The mesh local X axis in view space — horizontal spread for H-plane, vertical for V-plane
+	vec3 x_dir_vs = normalize((MODELVIEW_MATRIX * vec4(1.0, 0.0, 0.0, 0.0)).xyz);
 
-	// Right vector always perpendicular to beam and camera forward (0,0,-1 in view space)
-	vec3 right_raw = cross(beam_dir_vs, vec3(0.0, 0.0, -1.0));
-	vec3 right_vs = right_raw / max(length(right_raw), 0.001);
-
-	// Place vertex: along-beam position from VERTEX.z, width offset from VERTEX.x
+	// Along-beam position in view space from VERTEX.z (mesh local Z)
 	vec3 along_vs = (MODELVIEW_MATRIX * vec4(0.0, 0.0, VERTEX.z, 1.0)).xyz;
-	vec3 vertex_vs = along_vs + right_vs * VERTEX.x;
+	vec3 vertex_vs = along_vs + x_dir_vs * VERTEX.x;
 
 	POSITION = PROJECTION_MATRIX * vec4(vertex_vs, 1.0);
 }
