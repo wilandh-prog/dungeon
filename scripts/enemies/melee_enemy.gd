@@ -6,6 +6,7 @@ var current_anim := ""
 var idle_anim := ""
 var walk_anim := ""
 var attack_anim := ""
+var base_move_speed := 3.0
 
 func _ready() -> void:
 	max_hp = 40.0
@@ -14,6 +15,7 @@ func _ready() -> void:
 	attack_range = 1.8
 	attack_cooldown = 1.5
 	detection_range = 12.0
+	base_move_speed = move_speed
 	super._ready()
 	if model:
 		_make_materials_opaque(model)
@@ -125,7 +127,19 @@ func _strip_root_motion(anim_name: String) -> void:
 			anim.track_set_key_value(i, j, Vector3(0.0, pos.y, 0.0))
 	print("[MeleeEnemy] root motion stripped from ", anim_name)
 
+func _process(_delta: float) -> void:
+	if model:
+		call_deferred(&"_reset_model_xz")
+
+func _reset_model_xz() -> void:
+	if is_instance_valid(self) and model:
+		model.position.x = 0.0
+		model.position.z = 0.0
+
 func _physics_process(delta: float) -> void:
+	if state == "ATTACK":
+		velocity.x = 0.0
+		velocity.z = 0.0
 	super._physics_process(delta)
 	_face_target()
 	_update_animation()
@@ -145,10 +159,13 @@ func _update_animation() -> void:
 		return
 	var speed := Vector2(velocity.x, velocity.z).length()
 	if speed > 0.5 and walk_anim != "":
+		anim_player.speed_scale = clamp(speed / 2.0, 0.5, 3.0)
 		_play_anim(walk_anim)
 	elif state == "ATTACK" and attack_anim != "":
+		anim_player.speed_scale = 1.0
 		_play_anim(attack_anim)
 	elif idle_anim != "":
+		anim_player.speed_scale = 1.0
 		_play_anim(idle_anim)
 
 func _play_anim(anim_name: String) -> void:

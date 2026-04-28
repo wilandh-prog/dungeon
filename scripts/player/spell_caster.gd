@@ -74,6 +74,7 @@ func _try_cast() -> void:
 		_wand_cast_anim()
 
 func _cast_spell(spell: Dictionary) -> void:
+	AudioManager.play("spell_cast")
 	var scene: PackedScene
 	match spell.shape:
 		"BOLT":
@@ -93,7 +94,7 @@ func _cast_spell(spell: Dictionary) -> void:
 
 	if spell.shape == "NOVA":
 		instance.global_position = player.global_position
-	else:
+	elif spell.shape != "WALL":
 		var camera: Camera3D = player.camera
 		instance.global_position = wand_tip.global_position
 		instance.global_transform.basis = camera.global_transform.basis
@@ -106,6 +107,7 @@ func _start_beam(spell: Dictionary) -> void:
 
 	is_casting_beam = true
 	beam_spell = spell
+	AudioManager.play("spell_cast")
 
 	var instance := SpellBeamScene.instantiate()
 	instance.initialize(spell, player)

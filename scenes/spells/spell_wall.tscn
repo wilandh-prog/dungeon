@@ -1,19 +1,19 @@
-[gd_scene load_steps=5 format=3 uid="uid://bspellwall1"]
+[gd_scene load_steps=7 format=3 uid="uid://bspellwall1"]
 
 [ext_resource type="Script" path="res://scripts/spells/spell_wall.gd" id="1_wall"]
+[ext_resource type="Shader" path="res://resources/shaders/ice_wall.gdshader" id="2_ice"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_wall"]
-size = Vector3(4.0, 2.5, 0.3)
+size = Vector3(8.0, 2.5, 0.3)
 
-[sub_resource type="StandardMaterial3D" id="Material_wall"]
-transparency = 1
-albedo_color = Color(1, 1, 1, 0.6)
-emission_enabled = true
-emission = Color(1, 1, 1, 1)
-emission_energy_multiplier = 2.0
+[sub_resource type="ShaderMaterial" id="Material_ice"]
+shader = ExtResource("2_ice")
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_wall"]
-size = Vector3(4.0, 2.5, 0.5)
+[sub_resource type="BoxShape3D" id="BoxShape3D_area"]
+size = Vector3(8.0, 2.5, 0.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_body"]
+size = Vector3(8.0, 2.5, 0.4)
 
 [node name="SpellWall" type="Node3D"]
 script = ExtResource("1_wall")
@@ -21,7 +21,7 @@ script = ExtResource("1_wall")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
 mesh = SubResource("BoxMesh_wall")
-material_override = SubResource("Material_wall")
+material_override = SubResource("Material_ice")
 
 [node name="Area3D" type="Area3D" parent="."]
 collision_layer = 8
@@ -29,4 +29,12 @@ collision_mask = 4
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
-shape = SubResource("BoxShape3D_wall")
+shape = SubResource("BoxShape3D_area")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+shape = SubResource("BoxShape3D_body")

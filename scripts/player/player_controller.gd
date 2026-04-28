@@ -58,6 +58,7 @@ func _physics_process(delta: float) -> void:
 func take_damage(amount: float) -> void:
 	hp -= amount
 	hp_changed.emit(hp, max_hp)
+	AudioManager.play("player_hit")
 	if hp <= 0:
 		hp = 0
 		died.emit()

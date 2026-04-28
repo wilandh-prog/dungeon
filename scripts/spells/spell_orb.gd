@@ -10,6 +10,19 @@ var distance_traveled: float = 0.0
 var direction: Vector3 = Vector3.FORWARD
 var _exploded := false
 
+func _apply_color(color: Color) -> void:
+	var mesh := $MeshInstance3D as MeshInstance3D
+	if mesh == null:
+		return
+	var mat: ShaderMaterial
+	if mesh.material_override is ShaderMaterial:
+		mat = (mesh.material_override as ShaderMaterial).duplicate() as ShaderMaterial
+	else:
+		mat = ShaderMaterial.new()
+		mat.shader = preload("res://resources/shaders/orb_projectile.gdshader")
+	mat.set_shader_parameter("color_core", color)
+	mesh.material_override = mat
+
 func _ready() -> void:
 	speed = spell_data.get("speed", 8.0)
 	max_range = spell_data.get("range", 20.0)
@@ -47,7 +60,7 @@ func _explode() -> void:
 		return
 	_exploded = true
 	set_process(false)
-	$Area3D.monitoring = false
+	$Area3D.set_deferred("monitoring", false)
 
 	var enemies := get_tree().get_nodes_in_group("enemies")
 	for enemy: Node3D in enemies:

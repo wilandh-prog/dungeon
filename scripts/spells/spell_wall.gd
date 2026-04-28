@@ -4,11 +4,16 @@ var wall_range: float = 8.0
 var wall_lifetime: float = 5.0
 var tick_rate: float = 0.5
 var tick_timer: float = 0.0
-var wall_width: float = 4.0
+var wall_width: float = 8.0
 var wall_height: float = 2.5
+var spawn_distance: float = 5.0
+
+func _apply_color(_color: Color) -> void:
+	pass  # Ice wall keeps its own shader; ignore element color tint
 
 func _ready() -> void:
 	wall_range = spell_data.get("range", 8.0)
+	damage = maxf(0.0, damage - 20.0)
 	_on_cast()
 
 	# Place wall at distance in front of caster (using camera aim direction)
@@ -17,8 +22,9 @@ func _ready() -> void:
 		var forward := -camera.global_transform.basis.z
 		forward.y = 0
 		forward = forward.normalized()
-		global_position = caster.global_position + forward * (wall_range * 0.5)
-		look_at(caster.global_position, Vector3.UP)
+		global_position = caster.global_position + forward * spawn_distance
+		global_position.y = 0.0
+		look_at(Vector3(caster.global_position.x, 0.0, caster.global_position.z), Vector3.UP)
 
 	$Area3D.body_entered.connect(_on_area_body_entered)
 

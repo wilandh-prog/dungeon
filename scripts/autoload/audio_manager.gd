@@ -1,8 +1,5 @@
 extends Node
 
-# Audio manager with placeholder structure
-# Audio streams can be swapped in later without changing any calling code
-
 var sfx_players: Dictionary = {}
 
 const SFX_NAMES := [
@@ -11,18 +8,21 @@ const SFX_NAMES := [
 ]
 
 func _ready() -> void:
-	# Create AudioStreamPlayer for each sound effect
 	for sfx_name in SFX_NAMES:
 		var player := AudioStreamPlayer.new()
 		player.name = sfx_name
-		player.bus = "SFX"
+		player.bus = "Master"
 		add_child(player)
 		sfx_players[sfx_name] = player
+		var path := "res://resources/audio/%s.ogg" % sfx_name
+		if ResourceLoader.exists(path):
+			player.stream = load(path)
 
-func play(sfx_name: String) -> void:
+func play(sfx_name: String, pitch_scale: float = 1.0) -> void:
 	if sfx_players.has(sfx_name):
 		var player: AudioStreamPlayer = sfx_players[sfx_name]
 		if player.stream != null:
+			player.pitch_scale = pitch_scale
 			player.play()
 
 func set_stream(sfx_name: String, stream: AudioStream) -> void:

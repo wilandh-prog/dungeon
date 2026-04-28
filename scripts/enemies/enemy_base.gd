@@ -19,13 +19,18 @@ var room_node: Node3D = null
 @onready var nav_agent: NavigationAgent3D = $NavigationAgent3D
 
 func _ready() -> void:
-	hp = max_hp * GameManager.get_difficulty_multiplier()
-	attack_damage *= GameManager.get_difficulty_multiplier()
+	var diff := GameManager.get_difficulty_multiplier()
+	var speed_mult := minf(1.0 + 0.1 * (GameManager.current_floor - 1), 2.0)
+	hp = max_hp * diff
+	attack_damage *= diff
+	move_speed *= speed_mult
+	attack_cooldown /= speed_mult
 	add_to_group("enemies")
 	# Find parent room
 	var parent := get_parent()
 	if parent and parent.has_method("on_enemy_died"):
 		room_node = parent
+	_apply_difficulty_visuals()
 
 func activate() -> void:
 	state = "CHASE"
@@ -114,6 +119,7 @@ func take_damage(amount: float) -> void:
 	if state == "DEAD":
 		return
 	hp -= amount
+	AudioManager.play("enemy_hit", randf_range(0.9, 1.1))
 	_on_hit()
 	if hp <= 0:
 		_die()
@@ -124,6 +130,7 @@ func _on_hit() -> void:
 
 func _die() -> void:
 	state = "DEAD"
+	AudioManager.play("enemy_death")
 	GameManager.on_enemy_killed()
 	_drop_fragment()
 	if room_node and room_node.has_method("on_enemy_died"):
@@ -133,6 +140,25 @@ func _die() -> void:
 	var tween := create_tween()
 	tween.tween_property(self, "scale", Vector3(0.1, 0.1, 0.1), 0.3)
 	tween.tween_callback(queue_free)
+
+func _apply_difficulty_visuals() -> void:
+	var floor_num := GameManager.current_floor
+	if floor_num < 3:
+		return
+	var light := OmniLight3D.new()
+	light.position = Vector3(0, 1.0, 0)
+	light.omni_range = 3.0
+	light.shadow_enabled = false
+	if floor_num <= 4:
+		light.light_color = Color(1.0, 0.5, 0.1)
+		light.light_energy = 0.8
+	elif floor_num <= 6:
+		light.light_color = Color(1.0, 0.1, 0.1)
+		light.light_energy = 1.2
+	else:
+		light.light_color = Color(0.7, 0.0, 1.0)
+		light.light_energy = 1.8
+	add_child(light)
 
 func _drop_fragment() -> void:
 	if not is_inside_tree():

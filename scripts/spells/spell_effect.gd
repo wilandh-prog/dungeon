@@ -40,6 +40,7 @@ func _on_cast() -> void:
 	pass
 
 func _on_hit(target: Node3D) -> void:
+	AudioManager.play("spell_hit")
 	if target.has_method("take_damage"):
 		target.take_damage(damage)
 
